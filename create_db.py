@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, Date, Time, ForeignKey, UniqueConstraint, CheckConstraint
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
 
 # create a base class
@@ -19,8 +18,8 @@ class Person(Base):
     housenumber = Column(String(5), nullable=False)
     city_id = Column(Integer, ForeignKey('cities.id'), nullable=False)
     landline = Column(String(20))
-    mobile = Column(String(20), unique=True)
-    email = Column(String(254), unique=True)
+    mobile = Column(String(20))
+    email = Column(String(254))
     enterdate = Column(Date, nullable=False, default=datetime.today)
     leavedate = Column(Date)
 
@@ -29,7 +28,7 @@ class Person(Base):
     employee = relationship('Employee', back_populates='person')
 
     __table_args__ = (
-        CheckConstraint('leavedate IS NULL OR leavedate > enterdate', name='check_leavedate')
+        CheckConstraint('leavedate IS NULL OR leavedate > enterdate', name='check_leavedate'),
     )
 
     def __repr__(self):
@@ -115,6 +114,10 @@ class ClassType(Base):
     room = relationship('Room', back_populates='classtypes')
     classofferings = relationship('ClassOffering', back_populates='classtype')
 
+    __table_args__ = (
+        CheckConstraint('maxparticipants > 0', name='check_maxparticipants'),
+    )
+
     def __repr__(self):
         return f"<ClassType(id={self.id}, name='{self.name}', maxparticipants={self.maxparticipants})>"
 
@@ -143,7 +146,7 @@ class ClassOffering(Base):
     classes = relationship('Class', back_populates='classoffering')
 
     __table_args__ = (
-        UniqueConstraint('classtype_id', 'trainer_id', name='uix_classtype_trainer')
+        UniqueConstraint('classtype_id', 'trainer_id', name='uix_classtype_trainer'),
     )
 
     def __repr__(self):
@@ -160,10 +163,10 @@ class Class(Base):
 
     classoffering = relationship('ClassOffering', back_populates='classes')
     weekday = relationship('Weekday', back_populates='classes')
-    registrations = relationship('Registrations', back_populates='class_')
+    registrations = relationship('Registration', back_populates='class_')
 
     __table_args__ = (
-        UniqueConstraint('classoffering_id', 'weekday_id', 'time', name='uix_classoffering_weekday_time')
+        UniqueConstraint('classoffering_id', 'weekday_id', 'time', name='uix_classoffering_weekday_time'),
     )
 
     def __repr__(self):
@@ -198,7 +201,7 @@ class Registration(Base):
 
     __table_args__ = (
         UniqueConstraint('class_id', 'member_id', name='uix_class_member'),
-        CheckConstraint('enddate IS NULL OR enddate > startdate', name='check_enddate')
+        CheckConstraint('enddate IS NULL OR enddate > startdate', name='check_enddate'),
     )
 
     def __repr__(self):
