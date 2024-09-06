@@ -1,11 +1,16 @@
-import csv
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from create_db import Base, Country, City, Person, Member, Employee, Trainer, Room, ClassType, ClassOffering, Weekday, Class, Registration
+import csv
 from datetime import datetime
-from create_db import Country, City, Person, Member, Employee, Trainer, Room, ClassType, ClassOffering, Weekday, Class, Registration
 
 # create database engine
 engine = create_engine('sqlite:///mygym.db')
+
+# drop all existing tables
+Base.metadata.drop_all(engine)
+Base.metadata.create_all(engine)
 
 # create session
 Session = sessionmaker(bind=engine)
