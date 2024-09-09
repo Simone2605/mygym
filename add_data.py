@@ -8,7 +8,7 @@ from datetime import datetime
 # create database engine
 engine = create_engine('sqlite:///mygym.db')
 
-# drop all existing tables
+# drop and recreate all existing tables
 Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
 
