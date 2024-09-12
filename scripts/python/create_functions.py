@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Table, MetaData, select, func, and_
 from datetime import datetime
 
 # create database engine
-engine = create_engine('sqlite:///mygym.db')
+engine = create_engine('sqlite:///data/mygym.db')
 
 # load metadata
 metadata = MetaData()
@@ -85,14 +85,6 @@ def count_registrations_by_year(year):
         return result[0] if result else 0
 
 
-# fetch and print registrations of the year 2021
-if __name__ == "__main__":
-    year = 2021
-    registrations_2021 = count_registrations_by_year(year)
-
-    print(f"{registrations_2021} persons registered in the year {year}.")
-
-
 # 2. Has the member with the ID ### terminated its membership?
 def is_membership_terminated(member_id):
     # check existence of member_id
@@ -107,20 +99,6 @@ def is_membership_terminated(member_id):
         result = connection.execute(query).fetchone()
         surname, forename, leavedate = result
         return (leavedate is not None and leavedate < datetime.now().date()), forename, surname
-
-
-# Check and print if the members with the IDs 2, 10, 11, 25 and 37 have terminated their membership
-if __name__ == "__main__":
-    member_ids = [2, 10, 11, 25, 37]
-
-    for member_id in member_ids:
-        try:
-            membership_terminated, forename, surname = is_membership_terminated(member_id)
-            status = "has terminated his/her membership" if membership_terminated else "is still an active member"
-            print(f"{forename} {surname} (ID: {member_id}) {status}.")
-
-        except ValueError as e:
-            print(e)
 
 
 # 3. Which class(es) does the trainer with the ID ### teach on weekday ID ###?
@@ -149,25 +127,6 @@ def get_classes_by_trainer(trainer_id, weekday_id):
 
         result = connection.execute(main_query).fetchall()
         return forename, surname, weekday, result
-
-
-# fetch and print classes of the trainers with the IDs 2 and 3 on weekday ID 2
-if __name__ == "__main__":
-    trainer_ids = [2, 3]
-    weekday_id = 2
-
-    for trainer_id in trainer_ids:
-        try:
-            forename, surname, weekday, classes_by_trainer = get_classes_by_trainer(trainer_id, weekday_id)
-            if not classes_by_trainer:
-                print(f"No classes found for trainer {forename} {surname} (ID: {trainer_id}) on {weekday}s.")
-            else:
-                print(f"Classes of trainer {forename} {surname} (ID: {trainer_id}) on {weekday}s:")
-                for class_ in classes_by_trainer:
-                    classtype, time = class_
-                    print(f" - {classtype} at {time.strftime('%H:%M')}")
-        except ValueError as e:
-            print(e)
 
 
 # 4. Is the member with the ID ### instructor of class ID ###?
@@ -199,19 +158,6 @@ def is_member_instructor(member_id, class_id):
         return forename, surname, class_, weekday, bool(result)
 
 
-# Check and print if the member with the ID 2 is instructor of classes with the IDs 1 and 6
-if __name__ == "__main__":
-    class_ids = [1, 6]
-
-    for class_id in class_ids:
-        try:
-            forename, surname, class_, weekday, member_instructor = is_member_instructor(member_ids[0], class_id)
-            status = "is the instructor" if member_instructor else "is not the instructor"
-            print(f"{forename} {surname} (ID: {member_ids[0]}) {status} of {class_} on {weekday}s.")
-        except ValueError as e:
-            print(e)
-
-
 # 5. How many members are registered for class ID ###?
 def get_registrations_by_class(class_id):
     # check existence of class_id
@@ -230,16 +176,6 @@ def get_registrations_by_class(class_id):
         result = connection.execute(query).fetchone()
 
         return class_, weekday, result[0] if result else 0
-
-
-# Check and print number of members registered for classes with the IDs 1 and 6
-if __name__ == "__main__":
-    for class_id in class_ids:
-        try:
-            class_, weekday, registration_count = get_registrations_by_class(class_id)
-            print(f"{registration_count} persons are registered for {class_} on {weekday}s.")
-        except ValueError as e:
-            print(e)
 
 
 # 6. Is the member with the ID ### registered for class ID ###?
@@ -261,21 +197,11 @@ def is_member_registered(member_id, class_id):
     with engine.connect() as connection:
         query = select(registrations.c.id
                        ).select_from(registrations
-                                     ).where(and_(registrations.c.member_id == member_id, registrations.c.class_id == class_id))
+                                     ).where(
+            and_(registrations.c.member_id == member_id, registrations.c.class_id == class_id))
 
         result = connection.execute(query).fetchone()
         return forename, surname, class_, weekday, bool(result)
-
-
-# Check and print if the members with the IDs 2, 10, 11, 25 and 37 are registered for class ID 6
-if __name__ == "__main__":
-    for member_id in member_ids:
-        try:
-            forename, surname, class_, weekday, member_registered = is_member_registered(member_id, class_ids[0])
-            status = "is registered" if member_registered else "is not registered"
-            print(f"{forename} {surname} (ID: {member_id}) {status} for {class_} on {weekday}s.")
-        except ValueError as e:
-            print(e)
 
 
 # 7. How many free spots are available for class ID ###?
@@ -305,13 +231,3 @@ def count_free_spots_by_class(class_id):
         free_spots = max(max_spots - occupied_spots, 0)
 
         return class_, weekday, free_spots
-
-
-# Check and print the number of free spots for the classes with the IDs 1 and 6
-if __name__ == "__main__":
-    for class_id in class_ids:
-        try:
-            class_, weekday, free_spots = count_free_spots_by_class(class_id)
-            print(f"{free_spots} free spots are available for {class_} on {weekday}s.")
-        except ValueError as e:
-            print(e)

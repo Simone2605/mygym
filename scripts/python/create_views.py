@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.sql import text
 
 # create database engine
-engine = create_engine('sqlite:///mygym.db')
+engine = create_engine('sqlite:///data/mygym.db')
 
 # drop and recreate views via SQL queries
 # 1. Who is teaching which class, and at what time and day?

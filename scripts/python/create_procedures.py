@@ -3,10 +3,11 @@ from datetime import datetime
 import create_functions as crfunc
 
 # create database engine
-engine = create_engine('sqlite:///mygym.db')
+engine = create_engine('sqlite:///data/mygym.db')
+
 
 # create procedures
-# Register a member ### as new participant of class ###
+# Register the member with the ID ### as new participant of class ID ###
 def add_registration(member_id, class_id):
     try:
         # check existence of member_id
@@ -43,18 +44,9 @@ def add_registration(member_id, class_id):
                 INSERT INTO registrations (class_id, member_id, startdate)
                 VALUES (:class_id, :member_id, :startdate)
                 """),
-                {'class_id': class_id, 'member_id': member_id,'startdate': datetime.now()}
+                {'class_id': class_id, 'member_id': member_id, 'startdate': datetime.now()}
             )
         return ("New participant has registered!")
 
     except ValueError as e:
         return str(e)
-
-# Registration of the members with the IDs 2, 10, 11, 24 and 37 to the class ID 6
-if __name__ == "__main__":
-    class_id = 1
-    member_ids = [2, 10, 11, 25, 37]
-
-    for member_id in member_ids:
-        feedback = add_registration(member_id, class_id)
-        print(feedback)

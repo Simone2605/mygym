@@ -210,7 +210,7 @@ class Registration(Base):
 
 
 # create database engine
-engine = create_engine('sqlite:///mygym.db')
+engine = create_engine('sqlite:///data/mygym.db')
 
 # create tables
 Base.metadata.create_all(engine)

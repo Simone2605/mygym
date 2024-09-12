@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 
 # create database engine
-engine = create_engine('sqlite:///mygym.db')
+engine = create_engine('sqlite:///data/mygym.db')
 
 # create trigger via sql query
 # Update enddate for class registrations based on leavedate changes
