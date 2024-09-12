@@ -103,7 +103,7 @@ Run the procedure tests using `test_procedures.py`:
 python tests/test_procedures.py
 ```
 
-### Conclusion
+## Conclusion
 
 This project serves as a practical example of using **Python** and **SQLAlchemy** to manage a database for a fitness
 gym. The focus is on understanding how SQL queries can be translated into Python code within **PyCharm**, providing a
